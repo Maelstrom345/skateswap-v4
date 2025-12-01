@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkateSwap - Buy & Sell Skate Gear</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            border-left: 4px solid #007bff;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .action-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            border-color: #007bff;
+        }
+        
+        .action-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .recent-activity {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin: 2rem 0;
+        }
+        
+        .activity-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-time {
+            color: #666;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>SkateSwap</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="active">Home</a>
+                <a href="browse.html">Browse</a>
+                <a href="post.html">Sell</a>
+                <a href="messages.html">Messages</a>
+                <a href="about.html">About</a>
+                <div class="auth-buttons" id="authButtons">
+                    <a href="login.html" class="btn-primary">Login</a>
+                    <a href="register.html" class="btn-secondary">Register</a>
+                </div>
+                <div class="user-menu" id="userMenu" style="display: none;"></div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Welcome to SkateSwap! 🛹</h1>
+            <p>Buy, sell, and trade skateboard gear with the global skate community.</p>
+            <div class="hero-buttons">
+                <a href="browse.html" class="btn-primary">Browse Gear</a>
+                <a href="post.html" class="btn-secondary">Start Selling</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="featured">
+        <div class="container">
+            <h2>Community Dashboard</h2>
+            
+            <!-- Stats Overview -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalListings">0</div>
+                    <div class="stat-label">Active Listings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Community Members</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCategories">8</div>
+                    <div class="stat-label">Gear Categories</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="recentActivity">0</div>
+                    <div class="stat-label">Recent Posts</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions" id="quickActions">
+                <!-- Actions will be loaded based on auth status -->
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <h3>Recent Listings</h3>
+                <div id="recentListings">
+                    <p>Loading recent activity...</p>
+                </div>
+            </div>
+
+            <!-- User Dashboard Link -->
+            <div id="userDashboard" style="text-align: center; margin: 2rem 0; display: none;">
+                <a href="dashboard.html" class="btn-primary">Go to My Dashboard</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 SkateSwap. Built with ❤️ for skaters worldwide.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🏠 Homepage loaded');
+            checkAuth();
+            loadDashboardData();
+        });
+
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            const userDashboard = document.getElementById('userDashboard');
+            const quickActions = document.getElementById('quickActions');
+            
+            if (user) {
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'flex';
+                userMenu.innerHTML = `
+                    <div class="user-dropdown">
+                        <span class="username">👋 ${user.username}</span>
+                        <div class="dropdown-content">
+                            <a href="dashboard.html">My Dashboard</a>
+                            <a href="post.html">Sell Gear</a>
+                            <a href="browse.html">Browse</a>
+                            <a href="messages.html">Messages</a>
+                            <a href="#" onclick="logout()">Logout</a>
+                        </div>
+                    </div>
+                `;
+                
+                // Show user dashboard link
+                userDashboard.style.display = 'block';
+                
+                // Show user-specific quick actions
+                quickActions.innerHTML = `
+                    <div class="action-card" onclick="window.location.href='post.html'">
+                        <div class="action-icon">🛍️</div>
+                        <h3>Sell Gear</h3>
+                        <p>List your skate gear for sale</p>
+                    </div>
+                    <div class="action-card" onclick="window.location.href='messages.html'">
+                        <div class="action-icon">💬</div>
+                        <h3>Messages</h3>
+                        <p>Check your conversations</p>
+                    </div>
+                    <div class="action-card" onclick="window.location.href='dashboard.html'">
+                        <div class="action-icon">📊</div>
+                        <h3>My Dashboard</h3>
+                        <p>View your activity</p>
+                    </div>
+                    <div class="action-card" onclick="window.location.href='browse.html'">
+                        <div class="action-icon">🔍</div>
+                        <h3>Browse</h3>
+                        <p>Find new gear</p>
+                    </div>
+                `;
+                
+                console.log(`✅ User ${user.username} is logged in`);
+            } else {
+                // Show guest quick actions
+                quickActions.innerHTML = `
+                    <div class="action-card" onclick="window.location.href='browse.html'">
+                        <div class="action-icon">🔍</div>
+                        <h3>Browse Gear</h3>
+                        <p>Find skateboard equipment</p>
+                    </div>
+                    <div class="action-card" onclick="window.location.href='login.html'">
+                        <div class="action-icon">👤</div>
+                        <h3>Login</h3>
+                        <p>Access your account</p>
+                    </div>
+                    <div class="action-card" onclick="window.location.href='register.html'">
+                        <div class="action-icon">📝</div>
+                        <h3>Register</h3>
+                        <p>Join the community</p>
+                    </div>
+                    <div class="action-card" onclick="window.location.href='about.html'">
+                        <div class="action-icon">ℹ️</div>
+                        <h3>About</h3>
+                        <p>Learn more about us</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadDashboardData() {
+            try {
+                // Load recent listings
+                const response = await fetch('/api/posts');
+                const result = await response.json();
+
+                if (result.success) {
+                    const posts = result.posts;
+                    
+                    // Update stats
+                    document.getElementById('totalListings').textContent = posts.length;
+                    document.getElementById('recentActivity').textContent = posts.slice(0, 5).length;
+                    
+                    // Display recent listings
+                    displayRecentListings(posts.slice(0, 5));
+                }
+
+                // Try to load user count (you might need to create this endpoint)
+                try {
+                    const usersResponse = await fetch('/api/stats/users');
+                    const usersResult = await usersResponse.json();
+                    if (usersResult.success) {
+                        document.getElementById('totalUsers').textContent = usersResult.count;
+                    }
+                } catch (error) {
+                    // Fallback user count
+                    document.getElementById('totalUsers').textContent = '100+';
+                }
+
+            } catch (error) {
+                console.error('❌ Error loading dashboard data:', error);
+                document.getElementById('recentListings').innerHTML = '<p>Error loading recent activity</p>';
+            }
+        }
+
+        function displayRecentListings(listings) {
+            const container = document.getElementById('recentListings');
+            
+            if (listings.length === 0) {
+                container.innerHTML = '<p>No recent listings found.</p>';
+                return;
+            }
+
+            container.innerHTML = listings.map(listing => `
+                <div class="activity-item">
+                    <div class="activity-icon">🛹</div>
+                    <div class="activity-content">
+                        <strong>${listing.title}</strong>
+                        <div>$${parseFloat(listing.price).toFixed(2)} • ${listing.category}</div>
+                        <div class="activity-time">Listed by ${listing.seller_name}</div>
+                    </div>
+                    <a href="item.html?id=${listing.id}" class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">View</a>
+                </div>
+            `).join('');
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - SkateSwap</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard-section {
+            padding: 2rem 0;
+            background: #f8f9fa;
+            min-height: 80vh;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .welcome-message {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f8f9fa;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .card-action {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .stats-mini {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .stat-mini {
+            padding: 1rem;
+        }
+
+        .stat-mini-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-mini-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .activity-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f8f9fa;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-message {
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .post-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f8f9fa;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .post-item:last-child {
+            border-bottom: none;
+        }
+
+        .post-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .post-info {
+            flex: 1;
+        }
+
+        .post-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .post-meta {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+
+        .conversation-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f8f9fa;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+        }
+
+        .conversation-item:last-child {
+            border-bottom: none;
+        }
+
+        .conversation-item:hover {
+            background: #f8f9fa;
+        }
+
+        .conversation-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .conversation-info {
+            flex: 1;
+        }
+
+        .conversation-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .conversation-last-message {
+            font-size: 0.9rem;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>SkateSwap</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="browse.html">Browse</a>
+                <a href="post.html">Sell</a>
+                <a href="messages.html">Messages</a>
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <div class="auth-buttons" id="authButtons">
+                    <a href="login.html" class="btn-primary">Login</a>
+                    <a href="register.html" class="btn-secondary">Register</a>
+                </div>
+                <div class="user-menu" id="userMenu" style="display: none;"></div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="dashboard-section">
+        <div class="container">
+            <div class="dashboard-header">
+                <div class="welcome-message" id="welcomeMessage">Welcome back!</div>
+                <p>Manage your skate gear and conversations</p>
+            </div>
+
+            <div id="loadingMessage" class="loading">
+                <p>Loading your dashboard...</p>
+            </div>
+
+            <div id="dashboardContent" style="display: none;">
+                <!-- Stats Overview -->
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-title">Quick Stats</div>
+                        </div>
+                        <div class="stats-mini">
+                            <div class="stat-mini">
+                                <div class="stat-mini-number" id="userPostsCount">0</div>
+                                <div class="stat-mini-label">My Listings</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-number" id="userConversationsCount">0</div>
+                                <div class="stat-mini-label">Conversations</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-number" id="totalEarnings">$0</div>
+                                <div class="stat-mini-label">Total Value</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-title">Quick Actions</div>
+                        </div>
+                        <div style="display: grid; gap: 1rem;">
+                            <a href="post.html" class="btn-primary" style="text-align: center;">➕ List New Item</a>
+                            <a href="browse.html" class="btn-secondary" style="text-align: center;">🔍 Browse Gear</a>
+                            <a href="messages.html" class="btn-outline" style="text-align: center;">💬 View Messages</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Listings -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-title">My Listings</div>
+                        <a href="post.html" class="card-action">Sell New Item</a>
+                    </div>
+                    <div id="myListings" class="activity-list">
+                        <div class="loading">Loading your listings...</div>
+                    </div>
+                </div>
+
+                <!-- Recent Conversations -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-title">Recent Conversations</div>
+                        <a href="messages.html" class="card-action">View All</a>
+                    </div>
+                    <div id="recentConversations" class="activity-list">
+                        <div class="loading">Loading conversations...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 SkateSwap. Built with ❤️ for skaters worldwide.</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+        });
+
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            
+            if (user) {
+                currentUser = user;
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'flex';
+                userMenu.innerHTML = `
+                    <div class="user-dropdown">
+                        <span class="username">👋 ${user.username}</span>
+                        <div class="dropdown-content">
+                            <a href="dashboard.html">My Dashboard</a>
+                            <a href="post.html">Sell Gear</a>
+                            <a href="browse.html">Browse</a>
+                            <a href="messages.html">Messages</a>
+                            <a href="#" onclick="logout()">Logout</a>
+                        </div>
+                    </div>
+                `;
+                
+                // Update welcome message
+                document.getElementById('welcomeMessage').textContent = `Welcome back, ${user.username}!`;
+                
+                // Load dashboard data
+                loadDashboardData();
+                
+            } else {
+                alert('Please login to view your dashboard');
+                window.location.href = 'login.html';
+            }
+        }
+
+      async function loadDashboardData() {
+    try {
+        // Load user's posts
+        const postsResponse = await fetch(`/api/users/${currentUser.id}/posts`);
+        if (!postsResponse.ok) {
+            throw new Error(`HTTP error! status: ${postsResponse.status}`);
+        }
+        const postsResult = await postsResponse.json();
+
+        // Load user's conversations
+        const convResponse = await fetch(`/api/conversations/${currentUser.id}`);
+        if (!convResponse.ok) {
+            throw new Error(`HTTP error! status: ${convResponse.status}`);
+        }
+        const convResult = await convResponse.json();
+
+        // Load user stats
+        const statsResponse = await fetch(`/api/users/${currentUser.id}/stats`);
+        let userStats = null;
+        if (statsResponse.ok) {
+            const statsResult = await statsResponse.json();
+            if (statsResult.success) {
+                userStats = statsResult.stats;
+            }
+        }
+
+        if (postsResult.success && convResult.success) {
+            displayDashboardData(postsResult.posts, convResult.conversations, userStats);
+        } else {
+            throw new Error('Failed to load dashboard data');
+        }
+
+    } catch (error) {
+        console.error('❌ Error loading dashboard data:', error);
+        showError('Failed to load dashboard data: ' + error.message);
+    }
+}
+
+function displayDashboardData(posts, conversations, userStats) {
+    // Hide loading, show content
+    document.getElementById('loadingMessage').style.display = 'none';
+    document.getElementById('dashboardContent').style.display = 'block';
+
+    // Update stats - use API data if available, otherwise calculate locally
+    if (userStats) {
+        document.getElementById('userPostsCount').textContent = userStats.postCount;
+        document.getElementById('userConversationsCount').textContent = userStats.conversationCount;
+        document.getElementById('totalEarnings').textContent = `$${userStats.totalValue}`;
+    } else {
+        // Fallback: calculate locally
+        document.getElementById('userPostsCount').textContent = posts.length;
+        document.getElementById('userConversationsCount').textContent = conversations.length;
+        const totalValue = posts.reduce((sum, post) => sum + parseFloat(post.price), 0);
+        document.getElementById('totalEarnings').textContent = `$${totalValue.toFixed(2)}`;
+    }
+
+    // Display user's listings
+    displayMyListings(posts);
+
+    // Display recent conversations
+    displayRecentConversations(conversations.slice(0, 5));
+}
+
+        function displayMyListings(posts) {
+            const container = document.getElementById('myListings');
+            
+            if (posts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🛹</div>
+                        <h3>No listings yet</h3>
+                        <p>Start selling your skate gear!</p>
+                        <a href="post.html" class="btn-primary" style="margin-top: 1rem;">List Your First Item</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = posts.map(post => `
+                <div class="post-item">
+                    <img src="${post.primary_image_url || post.image_urls?.[0] || getPlaceholderImage()}" 
+                         alt="${post.title}" 
+                         class="post-image"
+                         onerror="this.src='${getPlaceholderImage()}'">
+                    <div class="post-info">
+                        <div class="post-title">${post.title}</div>
+                        <div class="post-meta">
+                            $${parseFloat(post.price).toFixed(2)} • ${post.condition} • ${post.conversation_count || 0} inquiries
+                        </div>
+                    </div>
+                    <div class="post-actions">
+                        <a href="item.html?id=${post.id}" class="btn-small btn-primary">View</a>
+                        <button class="btn-small btn-outline" onclick="editPost(${post.id})">Edit</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displayRecentConversations(conversations) {
+            const container = document.getElementById('recentConversations');
+            
+            if (conversations.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💬</div>
+                        <h3>No conversations yet</h3>
+                        <p>Start chatting with buyers or sellers!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = conversations.map(conv => `
+                <div class="conversation-item" onclick="window.location.href='messages.html'">
+                    <img src="${conv.post_image || getPlaceholderImage()}" 
+                         alt="${conv.post_title}" 
+                         class="conversation-image"
+                         onerror="this.src='${getPlaceholderImage()}'">
+                    <div class="conversation-info">
+                        <div class="conversation-title">${conv.post_title}</div>
+                        <div class="conversation-last-message">${conv.last_message || 'No messages yet'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getPlaceholderImage() {
+            return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7inaa9w6dlYXI8L3RleHQ+PC9zdmc+';
+        }
+
+        function editPost(postId) {
+            // You can implement post editing functionality here
+            alert('Edit post functionality coming soon!');
+            // window.location.href = `edit-post.html?id=${postId}`;
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('loadingMessage').style.display = 'none';
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

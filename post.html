@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sell Your Gear - SkateSwap</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 📚 LESSON: Custom styles for this page */
+        .post-form-section {
+            padding: 2rem 0;
+            background: #f8f9fa;
+            min-height: 80vh;
+        }
+        
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .form-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .full-width {
+            width: 100%;
+        }
+        
+        /* 📚 LESSON: Image upload styles */
+        .image-upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            margin-bottom: 1rem;
+        }
+        
+        .image-upload-area:hover {
+            border-color: #007bff;
+        }
+        
+        .image-upload-area.dragover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        
+        .image-preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin: 1rem 0;
+        }
+        
+        .image-preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .image-preview {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .remove-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255,0,0,0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-outline:hover {
+            border-color: #007bff;
+            color: #007bff;
+        }
+        
+        .image-counter {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-progress {
+            margin: 10px 0;
+            text-align: center;
+            color: #007bff;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 📚 LESSON: Navigation - same on every page -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>SkateSwap</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="browse.html">Browse</a>
+                <a href="post.html" class="active">Sell</a>
+                <a href="about.html">About</a>
+                <div class="auth-buttons" id="authButtons">
+                    <a href="login.html" class="btn-primary">Login</a>
+                    <a href="register.html" class="btn-secondary">Register</a>
+                </div>
+                <div class="user-menu" id="userMenu" style="display: none;"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 📚 LESSON: Main form section -->
+    <section class="post-form-section">
+        <div class="container">
+            <div class="form-container">
+                <h1 class="form-title">Sell Your Gear</h1>
+                
+                <!-- 📚 LESSON: Error message display -->
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+                <div id="successMessage" class="success-message" style="display: none;"></div>
+
+                <!-- 📚 LESSON: Main form -->
+                <form id="postForm">
+                    <!-- Title -->
+                    <div class="form-group">
+                        <label for="title">Item Title *</label>
+                        <input type="text" id="title" placeholder="e.g., Santa Cruz Complete Skateboard" required>
+                    </div>
+
+                    <!-- Category and Condition -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="category">Category *</label>
+                            <select id="category" required>
+                                <option value="">Select Category</option>
+                                <option value="decks">Decks</option>
+                                <option value="trucks">Trucks</option>
+                                <option value="wheels">Wheels</option>
+                                <option value="bearings">Bearings</option>
+                                <option value="completes">Complete Skateboards</option>
+                                <option value="shoes">Shoes</option>
+                                <option value="protective">Protective Gear</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="condition">Condition *</label>
+                            <select id="condition" required>
+                                <option value="">Select Condition</option>
+                                <option value="new">New</option>
+                                <option value="like-new">Like New</option>
+                                <option value="excellent">Excellent</option>
+                                <option value="good">Good</option>
+                                <option value="fair">Fair</option>
+                                <option value="needs-repair">Needs Repair</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Price and Location -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="price">Price ($) *</label>
+                            <input type="number" id="price" placeholder="65.00" step="0.01" min="0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location">Location *</label>
+                            <input type="text" id="location" placeholder="Nairobi, Kenya" required>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label for="description">Description *</label>
+                        <textarea id="description" placeholder="Describe your item... include details about condition, usage, and any flaws." rows="4" required></textarea>
+                    </div>
+
+                    <!-- 📚 LESSON: Image Upload Section -->
+                    <div class="form-group">
+                        <label>Photos (Optional but recommended)</label>
+                        
+                        <!-- Image Upload Area -->
+                        <div class="image-upload-area" id="imageUploadArea">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📷</div>
+                            <h3>Add Photos</h3>
+                            <p>Drag & drop images here or click to browse</p>
+                            <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+                                Maximum 5 images • First image will be the main photo
+                            </p>
+                            <input type="file" id="imageInput" multiple accept="image/*" style="display: none;">
+                        </div>
+
+                        <!-- Upload Progress -->
+                        <div class="upload-progress" id="uploadProgress" style="display: none;">
+                            Uploading images... <span id="uploadStatus">0%</span>
+                        </div>
+
+                        <!-- Image Counter -->
+                        <div class="image-counter" id="imageCounter" style="display: none;">
+                            <span id="imageCount">0</span> images selected
+                        </div>
+
+                        <!-- Image Previews -->
+                        <div class="image-preview-container" id="imagePreviewContainer"></div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <button type="button" class="btn-outline" onclick="goBack()">Cancel</button>
+                        <button type="submit" class="btn-primary" id="submitBtn">Publish Listing</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 SkateSwap - Built with ❤️ for skaters</p>
+        </div>
+    </footer>
+
+    <!-- 📚 LESSON: JavaScript for form functionality -->
+    <script>
+        // Global variable to store uploaded image URLs
+        let uploadedImageUrls = [];
+
+        // This runs when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📝 Post page loaded');
+            
+            // Check if user is logged in
+            checkAuthStatus();
+            
+            // Setup image upload functionality
+            setupImageUpload();
+            
+            // Setup form submission
+            setupFormSubmission();
+        });
+
+        // 📚 LESSON: Check if user is authenticated
+        function checkAuthStatus() {
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            
+            if (user) {
+                // User is logged in - show user menu
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'flex';
+                userMenu.innerHTML = `
+                    <div class="user-dropdown">
+                        <span class="username">👋 ${user.username}</span>
+                        <div class="dropdown-content">
+                            <a href="post.html">Sell Gear</a>
+                            <a href="browse.html">Browse</a>
+                            <a href="#" onclick="logout()">Logout</a>
+                        </div>
+                    </div>
+                `;
+                console.log(`✅ User ${user.username} is logged in and can post`);
+            } else {
+                // User is not logged in - redirect to login
+                console.log('❌ User not logged in - redirecting to login');
+                alert('Please login to post items');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 📚 LESSON: Setup image upload functionality
+        function setupImageUpload() {
+            const imageUploadArea = document.getElementById('imageUploadArea');
+            const imageInput = document.getElementById('imageInput');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const imageCounter = document.getElementById('imageCounter');
+
+            // Click to upload
+            imageUploadArea.addEventListener('click', function() {
+                imageInput.click();
+            });
+
+            // File input change event
+            imageInput.addEventListener('change', function(e) {
+                handleImageFiles(e.target.files);
+                imageInput.value = ''; // Reset input
+            });
+
+            // 📚 LESSON: Drag and drop functionality
+            imageUploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                imageUploadArea.classList.add('dragover');
+            });
+
+            imageUploadArea.addEventListener('dragleave', function() {
+                imageUploadArea.classList.remove('dragover');
+            });
+
+            imageUploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                imageUploadArea.classList.remove('dragover');
+                handleImageFiles(e.dataTransfer.files);
+            });
+        }
+
+        // 📚 LESSON: Handle selected image files
+        async function handleImageFiles(files) {
+            const filesArray = Array.from(files);
+            
+            // Check if adding these files would exceed limit
+            if (filesArray.length + uploadedImageUrls.length > 5) {
+                alert('Maximum 5 images allowed. You can only add ' + (5 - uploadedImageUrls.length) + ' more images.');
+                return;
+            }
+            
+            // Show upload progress
+            const uploadProgress = document.getElementById('uploadProgress');
+            const uploadStatus = document.getElementById('uploadStatus');
+            uploadProgress.style.display = 'block';
+            
+            for (let i = 0; i < filesArray.length; i++) {
+                const file = filesArray[i];
+                
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select only image files');
+                    continue;
+                }
+
+                // Check file size (max 5MB for cloud storage)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image size should be less than 5MB');
+                    continue;
+                }
+
+                // Update progress
+                uploadStatus.textContent = `${Math.round(((i + 1) / filesArray.length) * 100)}%`;
+                
+                try {
+                    // Upload to cloud storage
+                    const imageUrl = await uploadToCloudinary(file);
+                    
+                    // Add to uploaded images array
+                    uploadedImageUrls.push(imageUrl);
+
+                    // Update UI
+                    updateImagePreviews();
+                    updateImageCounter();
+                    
+                } catch (error) {
+                    console.error('❌ Image upload failed:', error);
+                    alert(`Failed to upload image: ${file.name}`);
+                }
+            }
+            
+            // Hide progress when done
+            uploadProgress.style.display = 'none';
+        }
+
+        // 📚 LESSON: Upload image to Cloudinary
+        async function uploadToCloudinary(file) {
+            // Convert file to base64 for Cloudinary
+            const base64 = await convertFileToBase64(file);
+            
+            const response = await fetch('/api/upload-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    image: base64,
+                    fileName: `skateswap_${Date.now()}_${file.name}`
+                })
+            });
+
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Upload failed');
+            }
+            
+            console.log('✅ Image uploaded to Cloudinary:', result.imageUrl);
+            return result.imageUrl;
+        }
+
+        // 📚 LESSON: Convert file to base64
+        function convertFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    resolve(e.target.result); // Full data URL with prefix
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 📚 LESSON: Update image previews in the UI
+        function updateImagePreviews() {
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            
+            previewContainer.innerHTML = uploadedImageUrls.map((imageUrl, index) => `
+                <div class="image-preview-item">
+                    <img src="${imageUrl}" class="image-preview" alt="Preview ${index + 1}">
+                    <button type="button" class="remove-image" onclick="removeImage(${index})">×</button>
+                </div>
+            `).join('');
+        }
+
+        // 📚 LESSON: Update image counter
+        function updateImageCounter() {
+            const imageCounter = document.getElementById('imageCounter');
+            const imageCount = document.getElementById('imageCount');
+            
+            if (uploadedImageUrls.length > 0) {
+                imageCount.textContent = uploadedImageUrls.length;
+                imageCounter.style.display = 'block';
+            } else {
+                imageCounter.style.display = 'none';
+            }
+        }
+
+        // 📚 LESSON: Remove image from array
+        function removeImage(index) {
+            uploadedImageUrls.splice(index, 1);
+            updateImagePreviews();
+            updateImageCounter();
+        }
+
+        // 📚 LESSON: Setup form submission
+        function setupFormSubmission() {
+            const form = document.getElementById('postForm');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault(); // Prevent default form submission
+                
+                // Check if user is logged in
+                const user = JSON.parse(localStorage.getItem('user') || 'null');
+                if (!user) {
+                    alert('Please login to post items');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Get form data
+                const formData = {
+                    sellerId: user.id,
+                    title: document.getElementById('title').value,
+                    category: document.getElementById('category').value,
+                    price: parseFloat(document.getElementById('price').value),
+                    condition: document.getElementById('condition').value,
+                    description: document.getElementById('description').value,
+                    location: document.getElementById('location').value,
+                    imageUrls: uploadedImageUrls,
+                    primaryImageUrl: uploadedImageUrls[0] || null
+                };
+
+                // Validate form
+                if (!validateForm(formData)) {
+                    return;
+                }
+
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Publishing...';
+
+                try {
+                    console.log('📤 Sending post data:', {
+                        title: formData.title,
+                        category: formData.category,
+                        price: formData.price,
+                        images: formData.imageUrls.length
+                    });
+
+                    // 📚 LESSON: Send POST request to API
+                    const response = await fetch('/api/posts', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const result = await response.json();
+                    console.log('📨 API response:', result);
+
+                    if (result.success) {
+                        // Success!
+                        showSuccess('Listing created successfully! 🎉');
+                        console.log('✅ Post created with ID:', result.post.id);
+                        
+                        // Redirect to browse page after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = 'browse.html';
+                        }, 2000);
+                    } else {
+                        throw new Error(result.message || 'Failed to create post');
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error creating post:', error);
+                    showError('Failed to create listing: ' + error.message);
+                } finally {
+                    // Reset button state
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Publish Listing';
+                }
+            });
+        }
+
+        // 📚 LESSON: Form validation
+        function validateForm(data) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.style.display = 'none';
+
+            // Check required fields
+            if (!data.title || !data.category || !data.price || !data.condition || !data.description || !data.location) {
+                showError('Please fill in all required fields');
+                return false;
+            }
+
+            // Check price is valid
+            if (data.price <= 0) {
+                showError('Price must be greater than 0');
+                return false;
+            }
+
+            // Check description length
+            if (data.description.length < 10) {
+                showError('Please provide a more detailed description (at least 10 characters)');
+                return false;
+            }
+
+            return true;
+        }
+
+        // 📚 LESSON: Helper functions for messages
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Scroll to error message
+            errorDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            
+            // Scroll to success message
+            successDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 📚 LESSON: Navigation functions
+        function goBack() {
+            if (confirm('Are you sure? Your unsaved changes will be lost.')) {
+                window.history.back();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

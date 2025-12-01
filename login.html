@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SkateSwap</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .full-width { width: 100%; }
+        .test-credentials {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>SkateSwap</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="browse.html">Browse</a>
+                <a href="post.html">Sell</a>
+                <a href="about.html">About</a>
+                <div class="auth-buttons">
+                    <a href="login.html" class="btn-primary">Login</a>
+                    <a href="register.html" class="btn-secondary">Register</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="auth-section">
+        <div class="auth-container">
+            <div class="auth-card">
+                <h1>Welcome Back</h1>
+                <p>Sign in to your SkateSwap account</p>
+
+                <div class="test-credentials">
+                    <h4>Test Account:</h4>
+                    <p><strong>Email:</strong> test@example.com</p>
+                    <p><strong>Password:</strong> password123</p>
+                </div>
+
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="test@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="password123" required>
+                    </div>
+
+                    <button type="submit" class="btn-primary full-width" id="loginBtn">
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    <p>Don't have an account? <a href="register.html">Sign up</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 SkateSwap</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔐 Login page loaded');
+            document.getElementById('email').value = 'test@example.com';
+            document.getElementById('password').value = 'password123';
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('errorMessage');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Signing in...';
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    localStorage.setItem('token', data.token);
+                    
+                    alert(`Welcome back, ${data.user.username}! 🎉`);
+                    window.location.href = 'index.html';
+                    
+                } else {
+                    errorDiv.textContent = data.message || 'Login failed';
+                    errorDiv.style.display = 'block';
+                }
+                
+            } catch (error) {
+                errorDiv.textContent = 'Network error. Please check your connection.';
+                errorDiv.style.display = 'block';
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign In';
+            }
+        });
+    </script>
+</body>
+</html>

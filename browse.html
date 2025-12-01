@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Gear - SkateSwap</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .listing-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        .listing-card:hover {
+            transform: translateY(-5px);
+        }
+        .listing-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .listing-info {
+            padding: 1.5rem;
+        }
+        .price {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 0.5rem;
+        }
+        .search-container {
+            margin: 20px 0;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .category-placeholder {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand"><h1>SkateSwap</h1></div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="browse.html" class="active">Browse</a>
+                <a href="post.html">Sell</a>
+                <a href="about.html">About</a>
+                <div class="auth-buttons" id="authButtons">
+                    <a href="login.html" class="btn-primary">Login</a>
+                    <a href="register.html" class="btn-secondary">Register</a>
+                </div>
+                <div class="user-menu" id="userMenu" style="display: none;"></div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="featured">
+        <div class="container">
+            <h2>All Listings</h2>
+            
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search by title, category, or location..." class="search-input">
+            </div>
+
+            <div id="listingsContainer" class="listings-grid">
+                <p>Loading listings...</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container"><p>© 2025 SkateSwap</p></div>
+    </footer>
+
+    <script>
+        let allListings = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadListings();
+            document.getElementById('searchInput').addEventListener('input', filterListings);
+        });
+
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            
+            if (user) {
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'flex';
+                userMenu.innerHTML = `
+                    <div class="user-dropdown">
+                        <span class="username">👋 ${user.username}</span>
+                        <div class="dropdown-content">
+                            <a href="post.html">Sell Gear</a>
+                            <a href="browse.html">Browse</a>
+                            <a href="#" onclick="logout()">Logout</a>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadListings() {
+            try {
+                const response = await fetch('/api/posts');
+                const result = await response.json();
+                
+                console.log('📦 Listings data:', result);
+                
+                if (result.success) {
+                    allListings = result.posts;
+                    renderListings(allListings);
+                }
+            } catch (error) {
+                console.error('Error loading listings:', error);
+                document.getElementById('listingsContainer').innerHTML = 
+                    '<p>Error loading listings. Please try again later.</p>';
+            }
+        }
+
+        function renderListings(listings) {
+            const container = document.getElementById('listingsContainer');
+            
+            if (listings.length === 0) {
+                container.innerHTML = '<p>No listings found. <a href="post.html">Be the first to post one!</a></p>';
+                return;
+            }
+
+            container.innerHTML = listings.map(listing => {
+                // Get category color
+                const categoryColor = getCategoryColor(listing.category);
+                
+                // Use primary image if available, otherwise use category placeholder
+                let imageElement = '';
+                if (listing.primary_image_url) {
+                    imageElement = `
+                        <img src="${listing.primary_image_url}" 
+                             alt="${listing.title}" 
+                             class="listing-image"
+                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZmIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuKdpr3Dp2VhcjwvdGV4dD48L3N2Zz4='">
+                    `;
+                } else {
+                    imageElement = `
+                        <div class="category-placeholder" style="background: ${categoryColor}">
+                            <div class="placeholder-icon">🛹</div>
+                            <div>${listing.category}</div>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="listing-card" onclick="viewListing(${listing.id})">
+                        ${imageElement}
+                        <div class="listing-info">
+                            <h3>${listing.title}</h3>
+                            <div class="price">$${parseFloat(listing.price).toFixed(2)}</div>
+                            <p><strong>Condition:</strong> ${listing.condition || 'N/A'}</p>
+                            <p><strong>Category:</strong> ${listing.category}</p>
+                            <p><strong>Location:</strong> ${listing.location}</p>
+                            ${listing.seller_name ? `<p><strong>Seller:</strong> ${listing.seller_name}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getCategoryColor(category) {
+            const colors = {
+                'decks': '#ff6b6b',
+                'trucks': '#4ecdc4',
+                'wheels': '#45b7d1',
+                'bearings': '#96ceb4',
+                'completes': '#feca57',
+                'shoes': '#ff9ff3',
+                'protective': '#54a0ff',
+                'other': '#778beb'
+            };
+            return colors[category] || '#778beb';
+        }
+
+        function filterListings() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allListings.filter(listing => 
+                listing.title.toLowerCase().includes(searchTerm) ||
+                listing.category.toLowerCase().includes(searchTerm) ||
+                listing.location.toLowerCase().includes(searchTerm) ||
+                (listing.seller_name && listing.seller_name.toLowerCase().includes(searchTerm))
+            );
+            renderListings(filtered);
+        }
+
+        function viewListing(id) {
+            window.location.href = `item.html?id=${id}`;
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

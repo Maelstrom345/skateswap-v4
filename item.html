@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Details - SkateSwap</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .item-detail-section {
+            padding: 2rem 0;
+            background: #f8f9fa;
+            min-height: 80vh;
+        }
+
+        .item-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .item-images {
+            padding: 2rem;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .image-thumbnails {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .thumbnail.active,
+        .thumbnail:hover {
+            border-color: #007bff;
+        }
+
+        .item-info {
+            padding: 2rem;
+            border-left: 1px solid #eee;
+        }
+
+        .item-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .item-price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 1.5rem;
+        }
+
+        .item-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .item-description {
+            margin-bottom: 2rem;
+        }
+
+        .description-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .description-content {
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .seller-info {
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .seller-title {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .seller-details {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .seller-avatar {
+            width: 50px;
+            height: 50px;
+            background: #007bff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .seller-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .seller-location {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-contact {
+            flex: 1;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-contact:hover {
+            background: #0056b3;
+        }
+
+        .btn-back {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-back:hover {
+            border-color: #007bff;
+            color: #007bff;
+        }
+
+        .no-image-placeholder {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .placeholder-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .item-container {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .item-info {
+                border-left: none;
+                border-top: 1px solid #eee;
+            }
+
+            .item-meta {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>SkateSwap</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="browse.html">Browse</a>
+                <a href="post.html">Sell</a>
+                <a href="about.html">About</a>
+                <div class="auth-buttons" id="authButtons">
+                    <a href="login.html" class="btn-primary">Login</a>
+                    <a href="register.html" class="btn-secondary">Register</a>
+                </div>
+                <div class="user-menu" id="userMenu" style="display: none;"></div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="item-detail-section">
+        <div class="container">
+            <div id="loadingMessage" style="text-align: center; padding: 2rem;">
+                <p>Loading item details...</p>
+            </div>
+
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+            <div id="itemContainer" class="item-container" style="display: none;">
+                <!-- Images Section -->
+                <div class="item-images">
+                    <div id="mainImageContainer">
+                        <!-- Main image will be inserted here -->
+                    </div>
+                    <div id="thumbnailsContainer" class="image-thumbnails">
+                        <!-- Thumbnails will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Info Section -->
+                <div class="item-info">
+                    <h1 class="item-title" id="itemTitle"></h1>
+                    <div class="item-price" id="itemPrice"></div>
+
+                    <div class="item-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Condition</span>
+                            <span class="meta-value" id="itemCondition"></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Category</span>
+                            <span class="meta-value" id="itemCategory"></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Location</span>
+                            <span class="meta-value" id="itemLocation"></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Listed</span>
+                            <span class="meta-value" id="itemDate"></span>
+                        </div>
+                    </div>
+
+                    <div class="item-description">
+                        <h3 class="description-title">Description</h3>
+                        <p class="description-content" id="itemDescription"></p>
+                    </div>
+
+                    <div class="seller-info">
+                        <h3 class="seller-title">Seller Information</h3>
+                        <div class="seller-details">
+                            <div class="seller-avatar" id="sellerAvatar"></div>
+                            <div>
+                                <div class="seller-name" id="sellerName"></div>
+                                <div class="seller-location" id="sellerLocation"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-contact" onclick="contactSeller()">
+                            📞 Contact Seller
+                        </button>
+                        <a href="browse.html" class="btn-back">← Back to Listings</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 SkateSwap - Built with ❤️ for skaters</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentItem = null;
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadItemDetails();
+        });
+
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            
+            if (user) {
+                currentUser = user;
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'flex';
+                userMenu.innerHTML = `
+                    <div class="user-dropdown">
+                        <span class="username">👋 ${user.username}</span>
+                        <div class="dropdown-content">
+                            <a href="post.html">Sell Gear</a>
+                            <a href="browse.html">Browse</a>
+                            <a href="#" onclick="logout()">Logout</a>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadItemDetails() {
+            try {
+                // Get item ID from URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const itemId = urlParams.get('id');
+
+                if (!itemId) {
+                    throw new Error('No item ID specified');
+                }
+
+                console.log('📦 Loading item details for ID:', itemId);
+
+                const response = await fetch(`/api/posts/${itemId}`);
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to load item');
+                }
+
+                if (result.success) {
+                    currentItem = result.post;
+                    displayItemDetails();
+                } else {
+                    throw new Error(result.message || 'Item not found');
+                }
+
+            } catch (error) {
+                console.error('❌ Error loading item:', error);
+                showError('Failed to load item: ' + error.message);
+                
+                // Hide loading message
+                document.getElementById('loadingMessage').style.display = 'none';
+            }
+        }
+
+        function displayItemDetails() {
+            const item = currentItem;
+            
+            // Update page title
+            document.title = `${item.title} - SkateSwap`;
+
+            // Display basic info
+            document.getElementById('itemTitle').textContent = item.title;
+            document.getElementById('itemPrice').textContent = `$${parseFloat(item.price).toFixed(2)}`;
+            document.getElementById('itemCondition').textContent = formatCondition(item.condition);
+            document.getElementById('itemCategory').textContent = formatCategory(item.category);
+            document.getElementById('itemLocation').textContent = item.location;
+            document.getElementById('itemDescription').textContent = item.description;
+
+            // Format and display date
+            const listedDate = new Date(item.created_at);
+            document.getElementById('itemDate').textContent = listedDate.toLocaleDateString();
+
+            // Display seller info
+            document.getElementById('sellerName').textContent = item.seller_name || 'Unknown Seller';
+            document.getElementById('sellerAvatar').textContent = getInitials(item.seller_name || 'Seller');
+            document.getElementById('sellerLocation').textContent = item.seller_location || 'Location not specified';
+
+            // Display images
+            displayImages(item);
+
+            // Show the item container
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('itemContainer').style.display = 'grid';
+        }
+
+        function displayImages(item) {
+            const mainImageContainer = document.getElementById('mainImageContainer');
+            const thumbnailsContainer = document.getElementById('thumbnailsContainer');
+
+            // Get images array (could be image_urls or images array)
+            const images = item.image_urls || (item.images ? item.images.map(img => img.image_data || img.image_url) : []);
+            const primaryImage = item.primary_image_url;
+
+            if (images.length === 0 && !primaryImage) {
+                // No images - show placeholder
+                mainImageContainer.innerHTML = `
+                    <div class="no-image-placeholder">
+                        <div class="placeholder-icon">🛹</div>
+                        <div>No Images Available</div>
+                    </div>
+                `;
+                thumbnailsContainer.style.display = 'none';
+                return;
+            }
+
+            // Use primary image or first image as main image
+            const mainImageUrl = primaryImage || images[0];
+            
+            // Display main image
+            mainImageContainer.innerHTML = `
+                <img src="${mainImageUrl}" alt="${item.title}" class="main-image" id="mainImage">
+            `;
+
+            // Display thumbnails
+            thumbnailsContainer.innerHTML = '';
+
+            // Add primary image as first thumbnail if it exists
+            if (primaryImage && !images.includes(primaryImage)) {
+                addThumbnail(primaryImage, 0, true);
+            }
+
+            // Add all other images as thumbnails
+            images.forEach((imageUrl, index) => {
+                // Skip if this is already the primary image
+                if (imageUrl === primaryImage) return;
+                addThumbnail(imageUrl, index + (primaryImage ? 1 : 0), imageUrl === mainImageUrl);
+            });
+
+            // If no thumbnails, hide the container
+            if (thumbnailsContainer.children.length === 0) {
+                thumbnailsContainer.style.display = 'none';
+            }
+        }
+
+        function addThumbnail(imageUrl, index, isActive) {
+            const thumbnailsContainer = document.getElementById('thumbnailsContainer');
+            
+            const thumbnail = document.createElement('img');
+            thumbnail.src = imageUrl;
+            thumbnail.alt = `Thumbnail ${index + 1}`;
+            thumbnail.className = `thumbnail ${isActive ? 'active' : ''}`;
+            thumbnail.onclick = () => switchMainImage(imageUrl, index);
+            
+            thumbnailsContainer.appendChild(thumbnail);
+        }
+
+        function switchMainImage(imageUrl, index) {
+            // Update main image
+            const mainImage = document.getElementById('mainImage');
+            mainImage.src = imageUrl;
+
+            // Update active thumbnail
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            thumbnails.forEach((thumb, i) => {
+                thumb.classList.toggle('active', i === index);
+            });
+        }
+
+        function contactSeller() {
+    if (!currentItem) return;
+
+    const user = currentUser;
+    if (!user) {
+        alert('Please login to contact sellers');
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Check if user is trying to contact themselves
+    if (user.id === currentItem.seller_id) {
+        alert('You cannot contact yourself about your own listing.');
+        return;
+    }
+
+    // Start conversation
+    startConversation();
+}
+
+async function startConversation() {
+    try {
+        const response = await fetch('/api/conversations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                postId: currentItem.id,
+                buyerId: currentUser.id,
+                sellerId: currentItem.seller_id
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Open chat modal
+            openChatModal(result.conversation.id);
+        } else {
+            throw new Error(result.message);
+        }
+
+    } catch (error) {
+        console.error('❌ Error starting conversation:', error);
+        alert('Failed to start conversation: ' + error.message);
+    }
+}
+
+function openChatModal(conversationId) {
+    // Create chat modal
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    `;
+
+    modal.innerHTML = `
+        <div style="background: white; border-radius: 12px; width: 90%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column;">
+            <div style="padding: 1rem; border-bottom: 1px solid #eee; display: flex; justify-content: between; align-items: center;">
+                <h3 style="margin: 0;">Chat with ${currentItem.seller_name}</h3>
+                <button onclick="this.closest('div').remove()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+            </div>
+            <div id="chatMessages" style="flex: 1; padding: 1rem; overflow-y: auto; max-height: 400px;">
+                <div style="text-align: center; color: #666;">Loading messages...</div>
+            </div>
+            <div style="padding: 1rem; border-top: 1px solid #eee;">
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="messageInput" placeholder="Type your message..." 
+                           style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 8px;">
+                    <button onclick="sendMessage(${conversationId})" 
+                            style="padding: 0.75rem 1.5rem; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Load messages
+    loadMessages(conversationId);
+
+    // Focus on input
+    setTimeout(() => {
+        document.getElementById('messageInput').focus();
+    }, 100);
+}
+
+async function loadMessages(conversationId) {
+    try {
+        const response = await fetch(`/api/messages/${conversationId}?currentUserId=${currentUser.id}`);
+        const result = await response.json();
+
+        if (result.success) {
+            displayMessages(result.messages);
+        }
+    } catch (error) {
+        console.error('❌ Error loading messages:', error);
+    }
+}
+
+function displayMessages(messages) {
+    const container = document.getElementById('chatMessages');
+    
+    if (messages.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; color: #666; padding: 2rem;">
+                Start the conversation about "${currentItem.title}"
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = messages.map(message => `
+        <div style="margin-bottom: 1rem; display: flex; justify-content: ${message.sender_id === currentUser.id ? 'flex-end' : 'flex-start'};">
+            <div style="max-width: 70%; background: ${message.sender_id === currentUser.id ? '#007bff' : '#f1f1f1'}; 
+                        color: ${message.sender_id === currentUser.id ? 'white' : '#333'}; 
+                        padding: 0.75rem; border-radius: 12px; word-wrap: break-word;">
+                <div style="font-size: 0.9rem; margin-bottom: 0.25rem;">${message.sender_name}</div>
+                <div>${message.message}</div>
+                <div style="font-size: 0.7rem; opacity: 0.7; margin-top: 0.25rem;">
+                    ${new Date(message.created_at).toLocaleTimeString()}
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    // Scroll to bottom
+    container.scrollTop = container.scrollHeight;
+}
+
+async function sendMessage(conversationId) {
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    try {
+        const response = await fetch('/api/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                conversationId: conversationId,
+                senderId: currentUser.id,
+                message: message
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            input.value = '';
+            // Reload messages to show the new one
+            loadMessages(conversationId);
+        } else {
+            throw new Error(result.message);
+        }
+
+    } catch (error) {
+        console.error('❌ Error sending message:', error);
+        alert('Failed to send message: ' + error.message);
+    }
+}
+
+// Allow pressing Enter to send message
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && document.getElementById('messageInput')) {
+        const conversationId = document.querySelector('[onclick^="sendMessage"]').getAttribute('onclick').match(/\d+/)[0];
+        sendMessage(parseInt(conversationId));
+    }
+});
+
+        function formatCondition(condition) {
+            const conditionMap = {
+                'new': 'New',
+                'like-new': 'Like New',
+                'excellent': 'Excellent',
+                'good': 'Good',
+                'fair': 'Fair',
+                'needs-repair': 'Needs Repair'
+            };
+            return conditionMap[condition] || condition;
+        }
+
+        function formatCategory(category) {
+            return category.charAt(0).toUpperCase() + category.slice(1);
+        }
+
+        function getInitials(name) {
+            return name.split(' ').map(word => word[0]).join('').toUpperCase().substring(0, 2);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

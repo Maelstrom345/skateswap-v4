@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - SkateSwap</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .messages-section {
+            padding: 2rem 0;
+            background: #f8f9fa;
+            min-height: 80vh;
+        }
+
+        .messages-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            height: 70vh;
+        }
+
+        .conversations-list {
+            border-right: 1px solid #eee;
+            overflow-y: auto;
+        }
+
+        .conversation-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .conversation-item:hover,
+        .conversation-item.active {
+            background: #f8f9fa;
+        }
+
+        .conversation-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .conversation-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .conversation-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .conversation-participant {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .conversation-last-message {
+            color: #666;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .conversation-meta {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .unread-badge {
+            background: #007bff;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            margin-top: 0.25rem;
+        }
+
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .chat-header-image {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .chat-header-info {
+            flex: 1;
+        }
+
+        .chat-header-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .chat-header-price {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 0.75rem;
+            border-radius: 12px;
+            word-wrap: break-word;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background: #007bff;
+            color: white;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background: #f1f1f1;
+            color: #333;
+        }
+
+        .message-sender {
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+            opacity: 0.8;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+            text-align: right;
+        }
+
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .chat-input button {
+            padding: 0.75rem 1.5rem;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .chat-input button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .no-conversation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .no-messages {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+            text-align: center;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .message-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .read-status {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        .auth-required {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin: 2rem auto;
+            max-width: 500px;
+        }
+
+        @media (max-width: 768px) {
+            .messages-container {
+                grid-template-columns: 1fr;
+                height: 80vh;
+            }
+
+            .conversations-list {
+                border-right: none;
+                border-bottom: 1px solid #eee;
+                max-height: 40%;
+            }
+
+            .chat-area {
+                max-height: 60%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>SkateSwap</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="browse.html">Browse</a>
+                <a href="post.html">Sell</a>
+                <a href="messages.html" class="active">Messages</a>
+                <a href="dashboard.html">Dashboard</a>
+                <div class="auth-buttons" id="authButtons">
+                    <a href="login.html" class="btn-primary">Login</a>
+                    <a href="register.html" class="btn-secondary">Register</a>
+                </div>
+                <div class="user-menu" id="userMenu" style="display: none;"></div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="messages-section">
+        <div class="container">
+            <h2>Your Messages</h2>
+            
+            <!-- Authentication Required Message -->
+            <div id="authRequired" class="auth-required" style="display: none;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🔒</div>
+                <h3>Authentication Required</h3>
+                <p>Please log in to view your messages.</p>
+                <div style="margin-top: 2rem;">
+                    <a href="login.html" class="btn-primary">Login</a>
+                    <a href="register.html" class="btn-secondary" style="margin-left: 1rem;">Register</a>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingMessage" style="text-align: center; padding: 2rem;">
+                <p>Loading conversations...</p>
+            </div>
+
+            <!-- Messages Container (only shown when authenticated) -->
+            <div id="messagesContainer" class="messages-container" style="display: none;">
+                <div class="conversations-list" id="conversationsList">
+                    <!-- Conversations will be loaded here -->
+                </div>
+                <div class="chat-area">
+                    <div id="chatHeader" class="chat-header" style="display: none;">
+                        <!-- Chat header will be loaded here -->
+                    </div>
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">💬</div>
+                            <h3>No conversation selected</h3>
+                            <p>Select a conversation from the list to start messaging</p>
+                        </div>
+                    </div>
+                    <div id="chatInput" class="chat-input" style="display: none;">
+                        <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+                        <button id="sendButton" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 SkateSwap. Built with ❤️ for skaters worldwide.</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentUser = null;
+        let currentConversation = null;
+        let conversations = [];
+        let messages = [];
+        let messageInterval = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('💬 Messages page loaded');
+            initializePage();
+        });
+
+        function initializePage() {
+            checkAuth();
+        }
+
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            const authRequired = document.getElementById('authRequired');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const messagesContainer = document.getElementById('messagesContainer');
+            
+            if (user && user.id && user.username) {
+                // User is properly logged in
+                currentUser = user;
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'flex';
+                userMenu.innerHTML = `
+                    <div class="user-dropdown">
+                        <span class="username">👋 ${user.username}</span>
+                        <div class="dropdown-content">
+                            <a href="dashboard.html">My Dashboard</a>
+                            <a href="post.html">Sell Gear</a>
+                            <a href="browse.html">Browse</a>
+                            <a href="messages.html">Messages</a>
+                            <a href="#" onclick="logout()">Logout</a>
+                        </div>
+                    </div>
+                `;
+                
+                // Hide auth required message, show messages
+                authRequired.style.display = 'none';
+                loadingMessage.style.display = 'block';
+                messagesContainer.style.display = 'grid';
+                
+                console.log(`✅ User ${user.username} is logged in, loading messages...`);
+                loadConversations();
+                
+            } else {
+                // User is not logged in or session is invalid
+                console.log('❌ User not logged in or session invalid');
+                
+                // Clear any invalid user data
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+                
+                // Show auth required message
+                loadingMessage.style.display = 'none';
+                messagesContainer.style.display = 'none';
+                authRequired.style.display = 'block';
+                
+                // Ensure auth buttons are visible
+                authButtons.style.display = 'flex';
+                userMenu.style.display = 'none';
+            }
+        }
+
+        // Enhanced authentication check with token verification
+        async function verifyToken() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            
+            if (!token || !user) {
+                return false;
+            }
+
+            try {
+                // You could add an API endpoint to verify tokens
+                const response = await fetch('/api/verify-token', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    return true;
+                } else {
+                    // Token is invalid, clear local storage
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('token');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Token verification failed:', error);
+                // If verification fails, assume token is still valid for now
+                return true;
+            }
+        }
+
+        async function loadConversations() {
+            if (!currentUser) {
+                console.error('No user found, cannot load conversations');
+                return;
+            }
+
+            try {
+                console.log(`📨 Loading conversations for user ${currentUser.id}...`);
+                const response = await fetch(`/api/conversations/${currentUser.id}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('📬 Conversations response:', result);
+
+                if (result.success) {
+                    conversations = result.conversations;
+                    displayConversations();
+                    
+                    document.getElementById('loadingMessage').style.display = 'none';
+                } else {
+                    throw new Error(result.message || 'Failed to load conversations');
+                }
+            } catch (error) {
+                console.error('❌ Error loading conversations:', error);
+                document.getElementById('loadingMessage').innerHTML = `
+                    <div style="color: #dc3545;">
+                        <p>Error loading conversations</p>
+                        <p style="font-size: 0.9rem;">${error.message}</p>
+                        <button onclick="loadConversations()" class="btn-primary" style="margin-top: 1rem;">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        function displayConversations() {
+            const container = document.getElementById('conversationsList');
+            
+            if (conversations.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💬</div>
+                        <h3>No conversations yet</h3>
+                        <p>Start a conversation by contacting a seller on an item page</p>
+                        <a href="browse.html" class="btn-primary" style="margin-top: 1rem;">Browse Items</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = conversations.map(conv => {
+                const otherUser = currentUser.id === conv.seller_id ? conv.buyer_name : conv.seller_name;
+                const lastMessage = conv.last_message || 'No messages yet';
+                const lastMessageTime = conv.last_message_time ? formatMessageTime(conv.last_message_time) : '';
+                const unreadCount = getUnreadCount(conv);
+
+                return `
+                    <div class="conversation-item ${currentConversation?.id === conv.id ? 'active' : ''}" 
+                         onclick="selectConversation(${conv.id})">
+                        <img src="${conv.post_image || getPlaceholderImage()}" 
+                             alt="${conv.post_title}" 
+                             class="conversation-image"
+                             onerror="this.src='${getPlaceholderImage()}'">
+                        <div class="conversation-info">
+                            <div class="conversation-title">${conv.post_title}</div>
+                            <div class="conversation-participant">with ${otherUser}</div>
+                            <div class="conversation-last-message">${lastMessage}</div>
+                        </div>
+                        <div class="conversation-meta">
+                            <div>${lastMessageTime}</div>
+                            ${unreadCount > 0 ? `<div class="unread-badge">${unreadCount}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getUnreadCount(conversation) {
+            // This would need to be calculated based on unread messages
+            // For now, return 0 - you can implement this later
+            return 0;
+        }
+
+        function getPlaceholderImage() {
+            return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7inaa9w6dlYXI8L3RleHQ+PC9zdmc+';
+        }
+
+        async function selectConversation(conversationId) {
+            if (!currentUser) {
+                alert('Please log in to view conversations');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Update UI
+            document.querySelectorAll('.conversation-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Load conversation details
+            const conversation = conversations.find(c => c.id === conversationId);
+            if (!conversation) return;
+
+            currentConversation = conversation;
+            await loadMessages(conversationId);
+            displayChatHeader(conversation);
+            
+            // Show chat input
+            document.getElementById('chatInput').style.display = 'flex';
+            
+            // Start polling for new messages
+            startMessagePolling();
+        }
+
+        function displayChatHeader(conversation) {
+            const header = document.getElementById('chatHeader');
+            const otherUser = currentUser.id === conversation.seller_id ? conversation.buyer_name : conversation.seller_name;
+            
+            header.innerHTML = `
+                <img src="${conversation.post_image || getPlaceholderImage()}" 
+                     alt="${conversation.post_title}" 
+                     class="chat-header-image"
+                     onerror="this.src='${getPlaceholderImage()}'">
+                <div class="chat-header-info">
+                    <div class="chat-header-title">${conversation.post_title}</div>
+                    <div class="chat-header-price">$${parseFloat(conversation.post_price).toFixed(2)}</div>
+                </div>
+                <div style="color: #666;">with ${otherUser}</div>
+            `;
+            header.style.display = 'flex';
+        }
+
+        async function loadMessages(conversationId) {
+            if (!currentUser) return;
+
+            try {
+                const response = await fetch(`/api/messages/${conversationId}?currentUserId=${currentUser.id}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    messages = result.messages;
+                    displayMessages();
+                }
+            } catch (error) {
+                console.error('❌ Error loading messages:', error);
+            }
+        }
+
+        function displayMessages() {
+            const container = document.getElementById('chatMessages');
+            
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💬</div>
+                        <h3>No messages yet</h3>
+                        <p>Start the conversation about this item</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = messages.map(message => {
+                const isSent = message.sender_id === currentUser.id;
+                const messageTime = formatMessageTime(message.created_at);
+                
+                return `
+                    <div class="message ${isSent ? 'sent' : 'received'}">
+                        ${!isSent ? `<div class="message-sender">${message.sender_name}</div>` : ''}
+                        <div>${message.message}</div>
+                        <div class="message-time">${messageTime}</div>
+                        ${isSent ? `
+                            <div class="message-status">
+                                <span class="read-status">${message.is_read ? 'Read' : 'Delivered'}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
+            if (!currentUser) {
+                alert('Please log in to send messages');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const input = document.getElementById('messageInput');
+            const button = document.getElementById('sendButton');
+            const message = input.value.trim();
+
+            if (!message || !currentConversation) return;
+
+            // Disable input while sending
+            input.disabled = true;
+            button.disabled = true;
+
+            try {
+                const response = await fetch('/api/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        conversationId: currentConversation.id,
+                        senderId: currentUser.id,
+                        message: message
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    input.value = '';
+                    // Add message to local array and refresh
+                    messages.push(result.message);
+                    displayMessages();
+                    
+                    // Update conversations list
+                    await loadConversations();
+                } else {
+                    throw new Error(result.message);
+                }
+
+            } catch (error) {
+                console.error('❌ Error sending message:', error);
+                alert('Failed to send message: ' + error.message);
+            } finally {
+                // Re-enable input
+                input.disabled = false;
+                button.disabled = false;
+                input.focus();
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function startMessagePolling() {
+            // Clear existing interval
+            if (messageInterval) {
+                clearInterval(messageInterval);
+            }
+
+            // Poll for new messages every 5 seconds
+            messageInterval = setInterval(async () => {
+                if (currentConversation && currentUser) {
+                    await loadMessages(currentConversation.id);
+                    await loadConversations(); // Update conversation list with new messages
+                }
+            }, 5000);
+        }
+
+        function formatMessageTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        function logout() {
+            // Clear polling interval
+            if (messageInterval) {
+                clearInterval(messageInterval);
+            }
+            
+            // Clear all local storage
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            
+            // Redirect to home page
+            window.location.href = 'index.html';
+        }
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', function() {
+            if (messageInterval) {
+                clearInterval(messageInterval);
+            }
+        });
+
+        // Check authentication when page becomes visible
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                checkAuth();
+            }
+        });
+
+        // Periodically check if user is still logged in
+        setInterval(() => {
+            checkAuth();
+        }, 30000); // Check every 30 seconds
+    </script>
+</body>
+</html>
